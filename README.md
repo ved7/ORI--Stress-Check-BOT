@@ -42,6 +42,7 @@ python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 uvicorn src.main:app --reload
+add .env file, example code below
 ```
 
 The backend loads `backend/.env` automatically. A minimal local config looks like this:
