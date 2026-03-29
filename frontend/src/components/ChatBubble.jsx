@@ -13,9 +13,11 @@ function ChatBubble({ message }) {
 
   return (
     <article className={bubbleClassName}>
-      <span className="chat-bubble__avatar" aria-hidden="true">{avatarLabel}</span>
+      <span className="chat-bubble__sr-only">{authorLabel}</span>
+      <span className="chat-bubble__avatar" aria-hidden="true">
+        {avatarLabel}
+      </span>
       <div className={surfaceClassName}>
-        <span className="chat-bubble__author">{authorLabel}</span>
         <div className="chat-bubble__content">
           {showTypingIndicator ? (
             <span className="chat-bubble__typing" aria-label="Ori is typing">
