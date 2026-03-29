@@ -102,6 +102,7 @@ function initialState() {
   return {
     clientId: storedState?.clientId ?? ensureClientId(),
     sessionId: storedState?.sessionId ?? crypto.randomUUID(),
+    // messages: sanitizeMessages(storedState?.messages),
     messages: sanitizeMessages(storedState?.messages),
     step: storedState?.step ?? 1,
     report: storedState?.report ?? null,
@@ -131,6 +132,17 @@ export function useChat() {
   const drainTimerRef = useRef(null);
   const drainStartTimerRef = useRef(null);
   const persistTimerRef = useRef(null);
+  const streamAbortRef = useRef(null);
+  const streamGenerationRef = useRef(0);
+
+  function abortActiveStream() {
+    streamAbortRef.current?.abort();
+    streamAbortRef.current = null;
+  }
+
+  function isAbortError(error) {
+    return error?.name === "AbortError";
+  }
 
   useEffect(() => {
     const payload = JSON.stringify({ clientId, sessionId, messages, step, report, isComplete });
@@ -164,6 +176,7 @@ export function useChat() {
   }, [clientId]);
 
   useEffect(() => () => {
+    abortActiveStream();
     stopDrainer();
     stopPersistTimer();
   }, []);
@@ -202,6 +215,7 @@ export function useChat() {
   }
 
   async function activateFreshSession(nextSessionId = crypto.randomUUID()) {
+    abortActiveStream();
     stopDrainer();
     stopPersistTimer();
     resetConversation(nextSessionId);
@@ -279,6 +293,11 @@ export function useChat() {
   }
 
   async function beginCheckIn(activeSessionId) {
+    const generation = ++streamGenerationRef.current;
+    abortActiveStream();
+    const controller = new AbortController();
+    streamAbortRef.current = controller;
+
     setErrorMessage("");
     setIsStreaming(true);
     setActiveHistorySessionId(activeSessionId);
@@ -293,9 +312,16 @@ export function useChat() {
         messages: [],
         step,
         onEvent: handleStreamEvent,
+        signal: controller.signal,
       });
+      if (generation !== streamGenerationRef.current) {
+        return;
+      }
       void refreshHistory();
     } catch (error) {
+      if (isAbortError(error) || generation !== streamGenerationRef.current) {
+        return;
+      }
       setErrorMessage(error.message);
       stopDrainer();
       setIsStreaming(false);
@@ -319,6 +345,11 @@ export function useChat() {
   }
 
   async function continueCheckIn(nextMessages) {
+    const generation = ++streamGenerationRef.current;
+    abortActiveStream();
+    const controller = new AbortController();
+    streamAbortRef.current = controller;
+
     setErrorMessage("");
     setIsStreaming(true);
     queueRef.current = "";
@@ -334,9 +365,16 @@ export function useChat() {
         messages: nextMessages,
         step,
         onEvent: handleStreamEvent,
+        signal: controller.signal,
       });
+      if (generation !== streamGenerationRef.current) {
+        return false;
+      }
       void refreshHistory();
     } catch (error) {
+      if (isAbortError(error) || generation !== streamGenerationRef.current) {
+        return false;
+      }
       stopDrainer();
       setIsStreaming(false);
       setErrorMessage(error.message);
