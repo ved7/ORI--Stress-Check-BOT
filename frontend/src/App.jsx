@@ -141,7 +141,7 @@ export default function App() {
                     : isGeneratingReport
                       ? "Generating profile"
                     : isStreaming
-                      ? "Ori is typing"
+                      ? "Typing…"
                       : "Ready for your response"}
               </span>
               <button className="conversation-panel__restart" disabled={isStreaming} type="button" onClick={restartSession}>
@@ -198,7 +198,7 @@ export default function App() {
                     onKeyDown={handleKeyDown}
                   />
                   <div className="chat-composer__footer">
-                    <span>{isGeneratingReport ? "Building your profile..." : isStreaming ? "Ori is responding..." : ""}</span>
+                    <span>{isGeneratingReport ? "Building your profile..." : isStreaming ? "Hang tight…" : ""}</span>
                     <button className="chat-composer__button" disabled={isStreaming || !draft.trim()} type="submit">
                       {isGeneratingReport ? "Generating..." : isStreaming ? "Listening..." : stepContent.buttonLabel}
                     </button>
