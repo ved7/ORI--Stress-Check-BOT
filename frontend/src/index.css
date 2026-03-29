@@ -1,0 +1,45 @@
+:root {
+  color-scheme: light;
+  font-family: "Manrope", sans-serif;
+  line-height: 1.5;
+  font-weight: 500;
+  color: #18342d;
+  --green-950: #17382f;
+  --green-900: #225344;
+  --green-800: #2f6d5a;
+  --green-700: #43866e;
+  --green-600: #6eab90;
+  --green-500: #89bea5;
+  --green-200: #d6e8dd;
+  --green-100: #e9f5ee;
+  --green-50: #f7fbf8;
+  --surface-strong: #ffffff;
+  --surface-soft: rgba(255, 255, 255, 0.88);
+  --surface-muted: #f4faf6;
+  --border-soft: rgba(67, 134, 110, 0.18);
+  --text-strong: #18342d;
+  --text-muted: #6b8a80;
+  --shadow-soft: rgba(34, 83, 68, 0.08);
+  background: #f8fbf9;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+  margin: 0;
+}
+
+body {
+  min-height: 100vh;
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+}
